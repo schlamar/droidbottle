@@ -49,16 +49,15 @@ class Cache(object):
             cur.execute('select count(*) from message where sent=?',
                         (sent,))
             if msgs > cur.fetchone()[0]:
-                print 'fetching new sms'
                 new_ids = self.droid.smsGetMessageIds(False, folder).result
                 old_ids = set()
                 cur.execute('select id from message where sent=?', (sent,))
-                for old_id in cur:
+                for old_id, in cur:
                     old_ids.add(old_id)
 
                 insert_ids = set(new_ids) - old_ids
                 for new_id in insert_ids:
-                    msg_obj = self.droid.smsGetMessageById(new_id)
+                    msg_obj = self.droid.smsGetMessageById(new_id).result
                     self._insert_message(msg_obj, sent)
 
 
@@ -123,5 +122,8 @@ def index():
 
 
 if __name__ == '__main__':
-    app.print_ip()
+    try:
+        app.print_ip()
+    except OSError:
+        pass
     bottle.run(app, host='', port=8080)
