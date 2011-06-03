@@ -30,7 +30,8 @@ Install
 Start service
 =============
 
-Start script *run_droidbootle.py* in SL4A.
+Start script *run_droidbootle.py* in SL4A or use ``./run.sh`` for
+a local USB connection.
 
 
 Forward port on USB connection
