@@ -1,3 +1,7 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+
 import re
 import sqlite3
 from collections import namedtuple
