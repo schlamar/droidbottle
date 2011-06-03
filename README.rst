@@ -1,3 +1,15 @@
+About
+=====
+
+This project tries to port some functionality of the //PAW Server//
+(http://paw-android.fun2code.de/) to the bottle webframework.
+
+Current functionality:
+
+- SMS threads
+- Send SMS
+
+
 Install
 =======
 
