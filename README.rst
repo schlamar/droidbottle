@@ -9,6 +9,10 @@ Current functionality:
 - SMS threads
 - Send SMS
 
+It works via WLAN or USB connection. When in WLAN mode, the ip to point
+your browser at will be shown in the notification area. With USB you
+have to forward the port 8080 with *adb* and use localhost
+(see related topic.)
 
 Install
 =======
