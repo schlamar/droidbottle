@@ -20,8 +20,8 @@ Install
 - Install the Android SDK (http://developer.android.com/sdk/)
   and make sure that the folder *platform-tools* is in your
   PATH (for ``adb``)
-- Install SL4A (http://code.google.com/p/android-scripting/)
-- Install Py4A (http://code.google.com/p/python-for-android/)
+- Install SL4A (http://code.google.com/p/android-scripting/) on your phone
+- Install Py4A (http://code.google.com/p/python-for-android/) on your phone
 - Start *Python for Android* on your phone and press "Install"
 - Get the current files of *droidbottle*
 - Run `./install.sh`
