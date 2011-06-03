@@ -17,7 +17,14 @@ have to forward the port 8080 with *adb* and use localhost
 Install
 =======
 
-Run `./install.sh`
+- Install the Android SDK (http://developer.android.com/sdk/)
+  and make sure that the folder *platform-tools* is in your
+  PATH (for ``adb``)
+- Install SL4A (http://code.google.com/p/android-scripting/)
+- Install Py4A (http://code.google.com/p/python-for-android/)
+- Start *Python for Android* on your phone and press "Install"
+- Get the current files of *droidbottle*
+- Run `./install.sh`
 
 
 Start service
