@@ -11,7 +11,7 @@ bottle.debug(True)
 Message = namedtuple('Message', ['id', 'address', 'body', 'date', 'sent'])
 
 class Cache(object):
-    '''Cache for data using a sqlite in memory database.'''
+    '''Cache for data using a sqlite in-memory database.'''
     def __init__(self, droid):
         self.droid = droid
         self.conn = sqlite3.connect(':memory:')
@@ -101,7 +101,7 @@ app = App()
 def sms_groups():
     ret = '<ul>\n'
     for address in app.cache.get_message_groups():
-        ret += '<li><a href="/sms/%s">%s</a></li>' % ((address,) * 2)
+        ret += '<li><a href="/sms/%s">%s</a></li>\n' % ((address,) * 2)
     ret += '</ul>'
     return ret
 
@@ -111,9 +111,25 @@ def sms_group(address):
     ret = '<ul>\n'
     for msg in app.cache.get_message_group(address):
         adr = 'Me' if msg.sent else msg.address
-        ret += '<li>%s: %s</li>' % (adr, msg.body)
+        ret += '<li>%s: %s</li>\n' % (adr, msg.body)
     ret += '</ul>'
+    ret += '<a href=/sms/%s/new>reply</a>' % address
     return ret
+
+
+@app.route('/sms/:address/new')
+def sms_form(address):
+    ret = '<p>Send sms to "%s"</p>' % address
+    ret += '<form method=POST action=/sms/%s/new>' % address
+    ret += '<textarea rows=5 cols=40 name=body></textarea>\n'
+    ret += '<input type=submit />'
+    ret += '</form>'
+    return ret
+
+@app.post('/sms/:address/new')
+def sms_send(address):
+    app.droid.smsSend(address, bottle.request.forms.get('body'))
+    return 'SMS sent. <a href=/sms/%s>back</a>' % address
 
 
 @app.route('/')
