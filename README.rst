@@ -24,7 +24,8 @@ Install
 - Install Py4A (http://code.google.com/p/python-for-android/) on your phone
 - Start *Python for Android* on your phone and press "Install"
 - Get the current files of *droidbottle*
-- Run `./install.sh`
+- Run ::
+    ./install.sh
 
 
 Start service
