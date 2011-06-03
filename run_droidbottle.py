@@ -78,6 +78,7 @@ class Cache(object):
         for m_id, address, body, sent in cur:
             yield Message(m_id, address, body, None, sent)
 
+
 class App(bottle.Bottle):
     def __init__(self):
         bottle.Bottle.__init__(self)
@@ -87,7 +88,8 @@ class App(bottle.Bottle):
 
     def print_ip(self):
         out,_ = Popen('netcfg', stdout=PIPE).communicate()
-        pattern = re.compile('tiwlan0\s+UP\s+(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})')
+        ip_pat = '\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}'
+        pattern = re.compile('tiwlan0\s+UP\s+(%s)' % ip_pat)
         match = pattern.search(out)
         ip = match.group(1) if match is not None else ''
         self.droid.notify('droidbottle', 'Running on "%s:8080"' % ip)
