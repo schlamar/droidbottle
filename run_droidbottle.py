@@ -132,8 +132,12 @@ def sms_form(address):
 
 @app.post('/sms/:address/new')
 def sms_send(address):
-    app.droid.smsSend(address, bottle.request.forms.get('body'))
-    return 'SMS sent. <a href=/sms/%s>back</a>' % address
+    act = 'android.intent.action.VIEW'
+    atype = 'vnd.android-dir/mms-sms'
+    extras = {'address': address,
+              'sms_body': bottle.request.forms.get('body')}
+    app.droid.startActivity(act, None, atype, extras)
+    return 'SMS pending. <a href=/sms/%s>back</a>' % address
 
 
 @app.route('/')
