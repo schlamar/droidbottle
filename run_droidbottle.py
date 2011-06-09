@@ -9,10 +9,12 @@ from subprocess import Popen, PIPE
 
 import android
 import bottle
+from bottle import view, route, post
 
 bottle.debug(True)
+bottle.TEMPLATE_PATH.append('/sdcard/sl4a/scripts/views')
 
-Message = namedtuple('Message', ['id', 'address', 'body', 'date', 'sent'])
+Message = namedtuple('Message', ['body', 'sent'])
 
 class Cache(object):
     '''Cache for data using a sqlite in-memory database.'''
@@ -76,78 +78,64 @@ class Cache(object):
     def get_message_group(self, address):
         self._update_sms_cache()
         cur = self.conn.cursor()
-        cur.execute('''select id, address, body, sent
-        from message where address=?''', (address,))
-        for m_id, address, body, sent in cur:
-            yield Message(m_id, address, body, None, sent)
+        cur.execute('''select body, sent from message
+        where address=?''', (address,))
+        for body, sent in cur:
+            yield Message(body, sent)
 
 
-class App(bottle.Bottle):
-    def __init__(self):
-        bottle.Bottle.__init__(self)
-        self.droid = android.Android()
-        self.cache = Cache(self.droid)
+droid = android.Android()
+cache = Cache(droid)
 
 
-    def print_ip(self):
-        out,_ = Popen('netcfg', stdout=PIPE).communicate()
-        ip_pat = '\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}'
-        pattern = re.compile('tiwlan0\s+UP\s+(%s)' % ip_pat)
-        match = pattern.search(out)
-        ip = match.group(1) if match is not None else ''
-        self.droid.notify('droidbottle', 'Running on "%s:8080"' % ip)
+def print_ip():
+    out,_ = Popen('netcfg', stdout=PIPE).communicate()
+    ip_pat = '\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}'
+    pattern = re.compile('tiwlan0\s+UP\s+(%s)' % ip_pat)
+    match = pattern.search(out)
+    ip = match.group(1) if match is not None else ''
+    droid.notify('droidbottle', 'Running on "%s:8080"' % ip)
 
 
-app = App()
+
+@route('/sms')
+@view('sms_threads')
+def sms_threads():
+    return dict(addresses=cache.get_message_groups())
 
 
-@app.route('/sms')
-def sms_groups():
-    ret = '<ul>\n'
-    for address in app.cache.get_message_groups():
-        ret += '<li><a href="/sms/%s">%s</a></li>\n' % ((address,) * 2)
-    ret += '</ul>'
-    return ret
-
-
-@app.route('/sms/:address')
+@route('/sms/:address')
+@view('sms_thread')
 def sms_group(address):
-    ret = '<ul>\n'
-    for msg in app.cache.get_message_group(address):
-        adr = 'Me' if msg.sent else msg.address
-        ret += '<li>%s: %s</li>\n' % (adr, msg.body)
-    ret += '</ul>'
-    ret += '<a href=/sms/%s/new>reply</a>' % address
-    return ret
+    return dict(messages=cache.get_message_group(address),
+                address=address,)
 
 
-@app.route('/sms/:address/new')
+@route('/sms/:address/new')
+@view('sms_form')
 def sms_form(address):
-    ret = '<p>Send sms to "%s"</p>' % address
-    ret += '<form method=POST action=/sms/%s/new>' % address
-    ret += '<textarea rows=5 cols=40 name=body></textarea>\n'
-    ret += '<input type=submit />'
-    ret += '</form>'
-    return ret
+    return dict(address=address)
 
-@app.post('/sms/:address/new')
+
+@post('/sms/:address/new')
+@view('sms_send')
 def sms_send(address):
     act = 'android.intent.action.VIEW'
     atype = 'vnd.android-dir/mms-sms'
     extras = {'address': address,
               'sms_body': bottle.request.forms.get('body')}
-    app.droid.startActivity(act, None, atype, extras)
-    return 'SMS pending. <a href=/sms/%s>back</a>' % address
+    droid.startActivity(act, None, atype, extras)
+    return dict(address=address)
 
 
-@app.route('/')
+@route('/')
 def index():
     bottle.redirect('/sms')
 
 
 if __name__ == '__main__':
     try:
-        app.print_ip()
+        print_ip()
     except OSError:
         pass
-    bottle.run(app, host='', port=8080)
+    bottle.run(host='', port=8080)
