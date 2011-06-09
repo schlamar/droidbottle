@@ -14,8 +14,8 @@ your browser at will be shown in the notification area. With USB you
 have to forward the port 8080 with *adb* and use localhost
 (see related topic.)
 
-Install
-=======
+Installation
+============
 
 - Install the Android SDK (http://developer.android.com/sdk/)
   and make sure that the folder *platform-tools* is in your
@@ -30,7 +30,7 @@ Install
 Start service
 =============
 
-Start script *run_droidbootle.py* in SL4A or use ``./run.sh`` for
+Start script *run_droidbootle.py* in SL4A or use ``./droidbottle-l`` for
 a local USB connection.
 
 
