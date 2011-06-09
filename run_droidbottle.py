@@ -51,20 +51,17 @@ class Cache(object):
         cur = self.conn.cursor()
         for folder in ('inbox', 'sent'):
             sent = folder == 'sent'
-            msgs = self.droid.smsGetMessageCount(False, folder).result
-            cur.execute('select count(*) from message where sent=?',
-                        (sent,))
-            if msgs > cur.fetchone()[0]:
-                new_ids = self.droid.smsGetMessageIds(False, folder).result
-                old_ids = set()
-                cur.execute('select id from message where sent=?', (sent,))
-                for old_id, in cur:
-                    old_ids.add(old_id)
+            new_ids = self.droid.smsGetMessageIds(False, folder).result
+            old_ids = set()
+            cur.execute('select id from message where sent=?', (sent,))
+            for old_id, in cur:
+                old_ids.add(old_id)
 
-                insert_ids = set(new_ids) - old_ids
-                for new_id in insert_ids:
-                    msg_obj = self.droid.smsGetMessageById(new_id).result
-                    self._insert_message(msg_obj, sent)
+            new_ids = set(new_ids)
+            insert_ids = new_ids - old_ids
+            for new_id in insert_ids:
+                msg_obj = self.droid.smsGetMessageById(new_id).result
+                self._insert_message(msg_obj, sent)
 
 
     def get_message_groups(self):
@@ -74,6 +71,7 @@ class Cache(object):
         order by date desc''')
         for address, in cur:
             yield address
+
 
     def get_message_group(self, address):
         self._update_sms_cache()
@@ -95,7 +93,6 @@ def print_ip():
     match = pattern.search(out)
     ip = match.group(1) if match is not None else ''
     droid.notify('droidbottle', 'Running on "%s:8080"' % ip)
-
 
 
 @route('/sms')
