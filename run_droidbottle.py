@@ -63,6 +63,11 @@ class Cache(object):
                 msg_obj = self.droid.smsGetMessageById(new_id).result
                 self._insert_message(msg_obj, sent)
 
+            delete_ids = old_ids - new_ids
+            for del_id in delete_ids:
+                cur.execute('delete from message where id=?', (del_id,))
+            self.conn.commit()
+
 
     def get_message_groups(self):
         self._update_sms_cache()
