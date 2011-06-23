@@ -13,4 +13,5 @@ window.scrollTo(0, document.body.scrollHeight);
 %end
 </ul>
 <a href=/sms/{{address}}/new>reply</a>
+<a href=/sms>back</a>
 %rebase layout title='SMS with %s' % address
