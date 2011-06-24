@@ -122,8 +122,12 @@ def sms_form(address):
 @post('/sms/:address/new')
 @view('sms_send')
 def sms_send(address):
-    act = 'android.intent.action.VIEW'
+    act = 'android.intent.action.MAIN'
+    cat = 'android.intent.category.DEFAULT'
     atype = 'vnd.android-dir/mms-sms'
+    droid.startActivity(act, cat, atype, None)
+
+    act = 'android.intent.action.VIEW'
     extras = {'address': address,
               'sms_body': bottle.request.forms.get('body')}
     droid.startActivity(act, None, atype, extras)
